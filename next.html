@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>APEX — Verified</title>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Saira:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0a0f;--panel:#12121a;--line:#1e1e2a;--txt:#e8e8f0;--txt-dim:#7a7a8a;--red:#ff2233;--red-glow:rgba(255,34,51,0.4);}
+  html,body{height:100%;margin:0;}
+  body{font-family:'Saira',sans-serif;background:var(--bg);color:var(--txt);display:flex;align-items:center;justify-content:center;min-height:100vh;position:relative;}
+  body::before{content:"";position:fixed;inset:0;background:radial-gradient(600px 400px at 50% 50%,rgba(255,34,51,0.12),transparent 60%);}
+  .card{position:relative;z-index:2;text-align:center;padding:56px 44px;max-width:460px;width:92%;background:var(--panel);border:1px solid var(--line);border-radius:20px;position:relative;}
+  .card::before{content:"";position:absolute;top:0;left:20%;right:20%;height:2px;background:linear-gradient(90deg,transparent,var(--red),transparent);box-shadow:0 0 20px var(--red);}
+  .ring{width:100px;height:100px;margin:0 auto 26px;border-radius:16px;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 0 50px var(--red-glow);animation:pop .6s cubic-bezier(0.2,0.9,0.3,1.2);}
+  .ring svg{width:52px;height:52px;}
+  @keyframes pop{0%{transform:scale(.4);opacity:0;}65%{transform:scale(1.08);}100%{transform:scale(1);opacity:1;}}
+  h2{font-family:'Chakra Petch',sans-serif;font-size:34px;font-weight:700;text-transform:uppercase;letter-spacing:0.02em;margin:0 0 12px;color:#fff;text-shadow:0 0 20px var(--red-glow);}
+  p{font-size:15px;color:var(--txt-dim);line-height:1.6;margin:0;}
+  .stamp{margin-top:28px;padding-top:22px;border-top:1px solid var(--line);display:flex;justify-content:center;gap:20px;font-family:'Chakra Petch',sans-serif;font-size:12px;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;color:var(--red);}
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="ring">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <h2>Access Granted</h2>
+    <p>Welcome to the arena. Redirecting…</p>
+    <div class="stamp"><span>Verified</span><span>Ready</span><span>Ranked</span></div>
+  </div>
+  <script>
+    setTimeout(function(){
+      var d=new URLSearchParams(location.search).get("to");
+      location.href=d||"https://www.google.com";
+    },1800);
+  </script>
+</body>
+</html>
